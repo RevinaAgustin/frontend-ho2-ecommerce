@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
