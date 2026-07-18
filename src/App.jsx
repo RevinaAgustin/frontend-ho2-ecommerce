@@ -14,7 +14,7 @@ function App() {
         <Header search={search} setSearch={setSearch} />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home search={search} />} />
+            <Route path="/" element={<Home search={search} setSearch={setSearch} />} />
             <Route path="/product/:id" element={<ProductDetail />} />
           </Routes>
         </main>
