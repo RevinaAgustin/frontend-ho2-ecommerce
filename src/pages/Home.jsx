@@ -3,36 +3,39 @@ import { Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import PaintReveal from '../components/PaintReveal';
 
-const carouselSlides = [
-    {
-        id: 1,
-        badge: "✨ Fresh Products Everyday",
-        title: "Belanja Semua Kebutuhanmu\nDalam Satu Tempat.",
-        subtitle: "Dari skincare, gadget, snack, hingga perlengkapan rumah.\nSemua ada di All Some Mart.",
-        button: <Link to="/products">"Mulai Belanja"</Link>,
-        bg: "bg-gradient-to-r from-orange-600 to-orange-400",
-        img: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200"
-    },
-    {
-        id: 2,
-        badge: "🔥 Super Promo",
-        title: "Electronics Week",
-        subtitle: "Upgrade gadget impianmu dengan potongan harga spesial hari ini.",
-        button: <Link to="/products">Lihat Promo</Link>,
-        bg: "bg-gradient-to-r from-gray-900 to-gray-800",
-        img: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&q=80&w=1200"
-    },
-    {
-        id: 3,
-        badge: "💄 Special Event",
-        title: "Beauty Festival",
-        subtitle: "Tampil bersinar dengan koleksi skincare dan kosmetik pilihan.",
-        button: <Link to="/products">Belanja Sekarang</Link>,
-        bg: "bg-gradient-to-r from-rose-500 to-pink-500",
-        img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=1200"
-    }
-];
+import baseImg from '../assets/Base.png';
+import revealImg from '../assets/Reveal.png';
+
+const brushTexture = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9J2cnPjxzdG9wIG9mZnNldD0nMCUnIHN0b3AtY29sb3I9J3doaXRlJyBzdG9wLW9wYWNpdHk9JzEnLz48c3RvcCBvZmZzZXQ9JzEwMCUnIHN0b3AtY29sb3I9J3doaXRlJyBzdG9wLW9wYWNpdHk9JzAnLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz48Y2lyY2xlIGN4PSc1MCcgY3k9JzUwJyByPSc1MCcgZmlsbD0ndXJsKCNnKScvPjwvc3ZnPg==";
+
+
+
+
+const TypewriterText = ({ text, speed = 50 }) => {
+    const [displayedText, setDisplayedText] = useState('');
+
+    useEffect(() => {
+        let i = 0;
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                setDisplayedText(text.slice(0, i + 1));
+                i++;
+            } else {
+                clearInterval(timer);
+            }
+        }, speed);
+        return () => clearInterval(timer);
+    }, [text, speed]);
+
+    return (
+        <>
+            {displayedText}
+            <span className="inline-block w-1 h-[0.8em] bg-orange-500 ml-1 animate-pulse align-baseline rounded-full"></span>
+        </>
+    );
+};
 
 const Home = ({ search, setSearch }) => {
     const [products, setProducts] = useState([]);
@@ -40,7 +43,6 @@ const Home = ({ search, setSearch }) => {
     const [error, setError] = useState(null);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [currentSlide, setCurrentSlide] = useState(0);
     const [timeLeft, setTimeLeft] = useState(2 * 3600 + 15 * 60 + 30);
 
     useEffect(() => {
@@ -50,12 +52,7 @@ const Home = ({ search, setSearch }) => {
         return () => clearInterval(timer);
     }, []);
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
-        }, 4000);
-        return () => clearInterval(timer);
-    }, []);
+
 
     useEffect(() => {
         axiosInstance.get('/products')
@@ -88,49 +85,74 @@ const Home = ({ search, setSearch }) => {
 
     return (
         <div className="w-full bg-[#F8F9FA]">
-            <div className="relative w-full overflow-hidden bg-gray-900 group">
-                <div 
-                    className="flex transition-transform duration-700 ease-in-out" 
-                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                >
-                    {carouselSlides.map((slide) => (
-                        <div key={slide.id} className="w-full flex-shrink-0 relative">
-                            <div className="absolute inset-0">
-                                <img src={slide.img} alt={slide.title} className="w-full h-full object-cover opacity-40 mix-blend-overlay" />
-                            </div>
-                            <div className={`absolute inset-0 ${slide.bg} opacity-90`}></div>
+            <div className="relative w-full bg-[#F9FAFB] overflow-hidden">
+                <div className="container mx-auto px-6 py-10 md:py-16 lg:py-20 flex flex-col-reverse md:flex-row items-center justify-between gap-12">
+                    {/* Text Content */}
+                    <div className="flex-1 flex flex-col items-start justify-center max-w-2xl relative z-10">
+                        <h1 className="relative text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight drop-shadow-sm whitespace-pre-line">
+                            {/* Invisible placeholder to reserve exact height */}
+                            <span className="invisible opacity-0 pointer-events-none">{"Belanja Semua Kebutuhanmu\nDalam Satu Tempat."}</span>
                             
-                            <div className="relative z-10 container mx-auto px-6 py-24 md:py-32 flex flex-col items-start justify-center min-h-[400px]">
-                                <span className="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold tracking-wider mb-4 border border-white/30">
-                                    {slide.badge}
-                                </span>
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 leading-[1.1] max-w-2xl drop-shadow-sm whitespace-pre-line">
-                                    {slide.title}
-                                </h1>
-                                <p className="text-lg md:text-xl text-white/90 max-w-xl font-medium mb-8 whitespace-pre-line drop-shadow-sm">
-                                    {slide.subtitle}
-                                </p>
-                                <button className="bg-white text-gray-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:bg-gray-100 hover:scale-105 transition-all duration-300">
-                                    {slide.button}
-                                </button>
+                            {/* Absolute typing text */}
+                            <span className="absolute top-0 left-0 w-full h-full">
+                                <TypewriterText text={"Belanja Semua Kebutuhanmu\nDalam Satu Tempat."} speed={50} />
+                            </span>
+                        </h1>
+                        <p className="text-lg md:text-xl text-gray-500 font-medium mb-10 whitespace-pre-line leading-relaxed">
+                            Dari skincare, gadget, snack, hingga perlengkapan rumah.<br />Semua ada di All Some Mart.
+                        </p>
+                        <div className="flex flex-wrap gap-4">
+                            <button onClick={() => document.getElementById('shop-by-category')?.scrollIntoView({ behavior: 'smooth' })} className="group flex items-center justify-center cursor-pointer">
+                                {/* Left Arrow Circle */}
+                                <div className="flex items-center justify-center overflow-hidden bg-orange-500 text-white rounded-full transition-all duration-500 ease-out w-12 h-12 mr-3 opacity-100 scale-100 group-hover:w-0 group-hover:mr-0 group-hover:scale-50 group-hover:opacity-0 origin-center shrink-0 shadow-md">
+                                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 17L17 7m0 0H8m9 0v9" />
+                                    </svg>
+                                </div>
+
+                                {/* Center Text Pill */}
+                                <div className="flex items-center justify-center bg-orange-500 text-white font-bold px-8 h-12 rounded-full shadow-md transition-all duration-500 ease-out group-hover:-rotate-[6deg] group-hover:scale-105 origin-center">
+                                    Mulai Belanja
+                                </div>
+
+                                {/* Right Arrow Circle */}
+                                <div className="flex items-center justify-center overflow-hidden bg-orange-500 text-white rounded-full transition-all duration-500 ease-out w-0 h-12 ml-0 opacity-0 scale-50 group-hover:w-12 group-hover:ml-3 group-hover:scale-100 group-hover:opacity-100 origin-center shrink-0 shadow-md">
+                                    <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 17L17 7m0 0H8m9 0v9" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Hero Image */}
+                    <div className="flex-1 relative w-full flex justify-center md:justify-end items-center min-h-[460px]">
+                        <div className="w-full max-w-[560px] h-[460px] relative z-10">
+                            <PaintReveal 
+                                baseImage={baseImg} 
+                                revealImage={revealImg} 
+                                brushTexture={brushTexture}
+                                brushSize={180}
+                                borderRadius={24} 
+                            />
+                            
+                            {/* Hover CTA */}
+                            <div className="absolute -bottom-4 -right-2 md:-right-6 text-orange-500 font-bold flex items-center gap-2 pointer-events-none z-20 drop-shadow-sm">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                                </svg>
+                                Click n hover!
                             </div>
                         </div>
-                    ))}
-                </div>
-                
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                    {carouselSlides.map((_, idx) => (
-                        <button 
-                            key={idx}
-                            onClick={() => setCurrentSlide(idx)}
-                            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/80'}`}
-                        />
-                    ))}
+                        
+                        {/* Decorative background blur */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-orange-400 rounded-full blur-[80px] opacity-20 -z-10 pointer-events-none"></div>
+                    </div>
                 </div>
             </div>
 
             <div className="container mx-auto px-4 md:px-6 py-12">
-                
+
                 {products.length > 0 && !search && selectedCategory === 'All' && (
                     <div className="mb-14">
                         <div className="flex items-end justify-between mb-6">
@@ -150,13 +172,13 @@ const Home = ({ search, setSearch }) => {
                             {products.slice(0, 5).map((item, idx) => {
                                 // Add fake discounts for the visual effect
                                 const fakeDiscount = [20, 50, 15, 30, 40][idx];
-                                return <ProductCard key={item.id} product={{...item, discountPercentage: fakeDiscount}} />
+                                return <ProductCard key={item.id} product={{ ...item, discountPercentage: fakeDiscount }} />
                             })}
                         </div>
                     </div>
                 )}
 
-                <div className="mb-10">
+                <div id="shop-by-category" className="mb-10 scroll-mt-24">
                     <div className="mb-6">
                         <h2 className="text-2xl font-black text-gray-900">Shop by Category</h2>
                         <p className="text-gray-500 mt-1">Temukan produk berdasarkan kategori favoritmu.</p>
@@ -164,17 +186,31 @@ const Home = ({ search, setSearch }) => {
                     <div className="flex flex-wrap gap-3">
                         <button
                             onClick={() => setSelectedCategory('All')}
-                            className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 border ${selectedCategory === 'All' ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-500 hover:text-orange-500'}`}
+                            className={`group relative overflow-hidden px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 border ${
+                                selectedCategory === 'All' 
+                                ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20' 
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-orange-500 hover:text-orange-500'
+                            }`}
                         >
-                            Semua Produk
+                            <span className="relative z-10">Semua Produk</span>
+                            {selectedCategory !== 'All' && (
+                                <span className="absolute left-0 top-full w-full h-full bg-orange-50 rounded-[50%] transition-all duration-500 ease-out group-hover:top-0 group-hover:rounded-none z-0"></span>
+                            )}
                         </button>
                         {categories.map((cat) => (
                             <button
                                 key={cat.id}
                                 onClick={() => setSelectedCategory(cat.name)}
-                                className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 border ${selectedCategory === cat.name ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20' : 'bg-white text-gray-600 border-gray-200 hover:border-orange-500 hover:text-orange-500'}`}
+                                className={`group relative overflow-hidden px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 border ${
+                                    selectedCategory === cat.name 
+                                    ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20' 
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-orange-500 hover:text-orange-500'
+                                }`}
                             >
-                                {cat.name}
+                                <span className="relative z-10">{cat.name}</span>
+                                {selectedCategory !== cat.name && (
+                                    <span className="absolute left-0 top-full w-full h-full bg-orange-50 rounded-[50%] transition-all duration-500 ease-out group-hover:top-0 group-hover:rounded-none z-0"></span>
+                                )}
                             </button>
                         ))}
                     </div>
